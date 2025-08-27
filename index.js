@@ -1,3 +1,4 @@
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -5,33 +6,32 @@
 import {GoogleGenAI, Type} from '@google/genai';
 
 // --- DOM Element Selection ---
-// Fix: Cast DOM elements to their specific types to resolve property access errors.
-const form = document.querySelector<HTMLFormElement>('form');
-const input = document.querySelector<HTMLInputElement>('#ingredients');
-const servingsInput = document.querySelector<HTMLInputElement>('#servings');
-const servingsDecrementBtn = document.querySelector<HTMLButtonElement>('#servings-decrement');
-const servingsIncrementBtn = document.querySelector<HTMLButtonElement>('#servings-increment');
-const mealPrepToggle = document.querySelector<HTMLInputElement>('#meal-prep-toggle');
-const allergiesInput = document.querySelector<HTMLInputElement>('#allergies');
-const suggestionButtons = document.querySelector<HTMLElement>('#suggestions');
-const voiceInputBtn = document.querySelector<HTMLButtonElement>('#voice-input-btn');
-const voiceError = document.querySelector<HTMLElement>('#voice-error');
-const saveAllergiesBtn = document.querySelector<HTMLButtonElement>('#save-allergies-btn');
+const form = document.querySelector('form');
+const input = document.querySelector('#ingredients');
+const servingsInput = document.querySelector('#servings');
+const servingsDecrementBtn = document.querySelector('#servings-decrement');
+const servingsIncrementBtn = document.querySelector('#servings-increment');
+const mealPrepToggle = document.querySelector('#meal-prep-toggle');
+const allergiesInput = document.querySelector('#allergies');
+const suggestionButtons = document.querySelector('#suggestions');
+const voiceInputBtn = document.querySelector('#voice-input-btn');
+const voiceError = document.querySelector('#voice-error');
+const saveAllergiesBtn = document.querySelector('#save-allergies-btn');
 
-const resultArea = document.querySelector<HTMLElement>('#result-area');
-const resultsContainer = document.querySelector<HTMLElement>('#results');
-const skeletonLoader = document.querySelector<HTMLElement>('#skeleton-loader');
-const recipeListView = document.querySelector<HTMLElement>('#recipe-list-view');
-const recipeDetailView = document.querySelector<HTMLElement>('#recipe-detail-view');
+const resultArea = document.querySelector('#result-area');
+const resultsContainer = document.querySelector('#results');
+const skeletonLoader = document.querySelector('#skeleton-loader');
+const recipeListView = document.querySelector('#recipe-list-view');
+const recipeDetailView = document.querySelector('#recipe-detail-view');
 
-const paginationControls = document.querySelector<HTMLElement>('#pagination-controls');
-const prevPageBtn = document.querySelector<HTMLButtonElement>('#prev-page-btn');
-const nextPageBtn = document.querySelector<HTMLButtonElement>('#next-page-btn');
-const pageIndicator = document.querySelector<HTMLElement>('#page-indicator');
+const paginationControls = document.querySelector('#pagination-controls');
+const prevPageBtn = document.querySelector('#prev-page-btn');
+const nextPageBtn = document.querySelector('#next-page-btn');
+const pageIndicator = document.querySelector('#page-indicator');
 
-const historyContainer = document.querySelector<HTMLElement>('#history-container');
+const historyContainer = document.querySelector('#history-container');
 
-const themeSwitcher = document.querySelector<HTMLInputElement>('#theme-switcher');
+const themeSwitcher = document.querySelector('#theme-switcher');
 
 // Bottom Nav
 const searchArea = document.getElementById('search-area');
@@ -45,16 +45,16 @@ const navButtons = {
 const allContentAreas = [searchArea, favoritesArea, shoppingListArea];
 const allNavButtons = Object.values(navButtons).filter(b => b !== null);
 
-const favoritesContainer = document.querySelector<HTMLElement>('#favorites-container');
-const shoppingListContainer = document.querySelector<HTMLElement>('#shopping-list-container');
-const shoppingListActions = document.querySelector<HTMLElement>('#shopping-list-actions');
-const copyShoppingListBtn = document.querySelector<HTMLButtonElement>('#copy-shopping-list');
+const favoritesContainer = document.querySelector('#favorites-container');
+const shoppingListContainer = document.querySelector('#shopping-list-container');
+const shoppingListActions = document.querySelector('#shopping-list-actions');
+const copyShoppingListBtn = document.querySelector('#copy-shopping-list');
 
 /**
  * Displays an error message in the results container.
  * @param {string} message The error message to display.
  */
-const showError = (message: string) => {
+const showError = (message) => {
     if (!resultsContainer || !paginationControls || !skeletonLoader) return;
     resultsContainer.innerHTML = `<p class="error">${message}</p>`;
     paginationControls.classList.add('hidden');
@@ -68,12 +68,11 @@ const FAVORITES_STORAGE_KEY = 'recipe-app-favorites';
 const SHOPPING_LIST_STORAGE_KEY = 'recipe-app-shopping-list';
 const ALLERGIES_STORAGE_KEY = 'recipe-app-allergies';
 
-let history: any[] = [];
-let currentHistoryItem: any = null;
+let history = [];
+let currentHistoryItem = null;
 let favorites = new Set();
 let shoppingList = new Map();
-// Fix: Typed recognition as any to handle non-standard SpeechRecognition API.
-let recognition: any = null;
+let recognition = null;
 
 
 // --- API Initialization ---
@@ -97,7 +96,7 @@ const loadStateFromLocalStorage = () => {
         if (storedShoppingList) {
             const parsed = JSON.parse(storedShoppingList);
             // Convert items back to a Set
-            parsed.forEach((item: any) => {
+            parsed.forEach((item) => {
                 item[1].items = new Set(item[1].items);
             });
             shoppingList = new Map(parsed);
@@ -133,19 +132,19 @@ const saveFavorites = () => {
 };
 const saveShoppingList = () => {
     // Convert Map to array and Set to array for JSON serialization
-    const arrayRepresentation = Array.from(shoppingList.entries()).map(([key, value]: [any, any]) => {
+    const arrayRepresentation = Array.from(shoppingList.entries()).map(([key, value]) => {
         return [key, { ...value, items: Array.from(value.items) }];
     });
     localStorage.setItem(SHOPPING_LIST_STORAGE_KEY, JSON.stringify(arrayRepresentation));
 };
-const saveAllergies = (value: string) => {
+const saveAllergies = (value) => {
     localStorage.setItem(ALLERGIES_STORAGE_KEY, value);
 };
 
 // --- Rendering Functions ---
 
 /** Creates the HTML for a single recipe card. */
-const createRecipeCard = (recipe: any, origin: string) => {
+const createRecipeCard = (recipe, origin) => {
     const card = document.createElement('button');
     card.className = 'result-card';
     card.dataset.recipeId = recipe.id;
@@ -203,7 +202,7 @@ const renderResultsPage = () => {
 
     resultsContainer.innerHTML = ''; // Clear previous results
     if (recipes && recipes.length > 0) {
-        recipes.forEach((recipe: any) => {
+        recipes.forEach((recipe) => {
             resultsContainer.appendChild(createRecipeCard(recipe, 'search'));
         });
     } else {
@@ -256,7 +255,7 @@ const renderHistory = () => {
 };
 
 /** Toggles a recipe in the favorites list. */
-const toggleFavorite = (recipeId: string) => {
+const toggleFavorite = (recipeId) => {
     if (favorites.has(recipeId)) {
         favorites.delete(recipeId);
     } else {
@@ -323,10 +322,10 @@ const renderSuggestionButtons = () => {
     history.forEach(item => {
         const ingredients = item.query.ingredients
             .split(/,|、|\s+/) // Split by comma, Japanese comma, or space
-            .map((ing: string) => ing.trim())
-            .filter((ing: string) => ing); // Remove empty strings
+            .map((ing) => ing.trim())
+            .filter((ing) => ing); // Remove empty strings
         
-        ingredients.forEach((ingredient: string) => {
+        ingredients.forEach((ingredient) => {
             ingredientCounts.set(ingredient, (ingredientCounts.get(ingredient) || 0) + 1);
         });
     });
@@ -371,17 +370,17 @@ const showRecipeListView = () => {
     resultsContainer?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
-const showRecipeDetailView = (recipe: any, origin: string) => {
+const showRecipeDetailView = (recipe, origin) => {
     if(!recipeListView || !recipeDetailView) return;
     recipeListView.classList.add('hidden');
     recipeDetailView.classList.remove('hidden');
 
-    const ingredientsHTML = recipe.ingredients.map((group: any) => `
+    const ingredientsHTML = recipe.ingredients.map((group) => `
         ${group.subHeading ? `<h4 class="material-subheading">${group.subHeading}</h4>` : ''}
-        ${group.items.map((item: string) => `<li><label><input type="checkbox" data-ingredient="${item}"> ${item}</label></li>`).join('')}
+        ${group.items.map((item) => `<li><label><input type="checkbox" data-ingredient="${item}"> ${item}</label></li>`).join('')}
     `).join('');
 
-    const instructionsHTML = recipe.instructions.map((step: string, index: number) => `<li><div class="step-number">${index + 1}</div><p>${step}</p></li>`).join('');
+    const instructionsHTML = recipe.instructions.map((step, index) => `<li><div class="step-number">${index + 1}</div><p>${step}</p></li>`).join('');
 
     recipeDetailView.innerHTML = `
         <div class="recipe-detail-header">
@@ -419,9 +418,8 @@ const showRecipeDetailView = (recipe: any, origin: string) => {
         }
     });
     
-    // Fix: Cast e.currentTarget to HTMLButtonElement to access classList.
     document.getElementById('detail-like-btn')?.addEventListener('click', (e) => {
-        const button = e.currentTarget as HTMLButtonElement;
+        const button = e.currentTarget;
         toggleFavorite(recipe.id);
         button.classList.toggle('liked');
 
@@ -434,12 +432,10 @@ const showRecipeDetailView = (recipe: any, origin: string) => {
     });
 
     document.getElementById('add-to-shopping-list-from-detail')?.addEventListener('click', () => {
-        // Fix: Specify the element type for querySelectorAll to get correct type inference for `cb`.
-        const checkboxes = recipeDetailView.querySelectorAll<HTMLInputElement>('.ingredient-list input[type="checkbox"]:checked');
+        const checkboxes = recipeDetailView.querySelectorAll('.ingredient-list input[type="checkbox"]:checked');
         const selectedItems = Array.from(checkboxes).map(cb => cb.dataset.ingredient || '');
         
-        // Fix: Cast the button to HTMLButtonElement to access `disabled` and `textContent` properties.
-        const button = document.getElementById('add-to-shopping-list-from-detail') as HTMLButtonElement | null;
+        const button = document.getElementById('add-to-shopping-list-from-detail');
         
         if (button) {
             if (selectedItems.length > 0) {
@@ -472,14 +468,14 @@ const showRecipeDetailView = (recipe: any, origin: string) => {
 };
 
 /** Switches the main content view. */
-const switchView = (targetAreaId: string) => {
+const switchView = (targetAreaId) => {
     allContentAreas.forEach(area => area?.classList.add('hidden'));
     allNavButtons.forEach(button => button?.classList.remove('active'));
 
     const targetArea = document.getElementById(targetAreaId);
     targetArea?.classList.remove('hidden');
 
-    const targetButton = navButtons[targetAreaId.replace('-area', '') as keyof typeof navButtons];
+    const targetButton = navButtons[targetAreaId.replace('-area', '')];
     targetButton?.classList.add('active');
 
     // If switching to the search area, always reset to the list view.
@@ -491,7 +487,7 @@ const switchView = (targetAreaId: string) => {
 
 // --- Gemini API ---
 
-const callGeminiAPI = async (query: any) => {
+const callGeminiAPI = async (query) => {
     const { ingredients, servings, mealPrep, allergies } = query;
     const prompt = `
         「${ingredients}」を使ったレシピを5つ提案してください。
@@ -552,7 +548,7 @@ const callGeminiAPI = async (query: any) => {
         const recipes = JSON.parse(responseText);
         
         // Add unique IDs to each recipe
-        return recipes.map((recipe: any) => ({ ...recipe, id: `recipe-${Date.now()}-${Math.random()}` }));
+        return recipes.map((recipe) => ({ ...recipe, id: `recipe-${Date.now()}-${Math.random()}` }));
 
     } catch (error) {
         console.error("Gemini API call failed:", error);
@@ -563,12 +559,11 @@ const callGeminiAPI = async (query: any) => {
 
 // --- Event Handlers ---
 
-const handleFormSubmit = async (event: Event) => {
+const handleFormSubmit = async (event) => {
     event.preventDefault();
     if (!form || !input || !servingsInput || !mealPrepToggle || !allergiesInput || !skeletonLoader || !resultsContainer || !resultArea) return;
 
-    // Fix: Cast submit button to HTMLButtonElement to access properties like `disabled`.
-    const submitButton = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    const submitButton = form.querySelector('button[type="submit"]');
     if (!submitButton) return;
     const ingredientsValue = input.value.trim();
     if (!ingredientsValue) {
@@ -617,7 +612,7 @@ const handleFormSubmit = async (event: Event) => {
     submitButton.textContent = 'レシピを探す';
 };
 
-const handleHistoryClick = (historyId: string) => {
+const handleHistoryClick = (historyId) => {
     const item = history.find(h => h.id === historyId);
     if (item) {
         currentHistoryItem = item;
@@ -677,8 +672,7 @@ const init = () => {
     });
 
     suggestionButtons?.addEventListener('click', (e) => {
-        // Fix: Cast e.target to HTMLElement to safely access classList and textContent.
-        const target = e.target as HTMLElement;
+        const target = e.target;
         if (target.classList.contains('suggestion-btn')) {
             if (input) {
                 const currentVal = input.value.trim();
@@ -724,8 +718,7 @@ const init = () => {
     });
 
     shoppingListContainer?.addEventListener('click', (e) => {
-        // Fix: Cast e.target to HTMLElement to safely access classList and dataset.
-        const target = e.target as HTMLElement;
+        const target = e.target;
         if (target.classList.contains('remove-recipe-btn')) {
             const recipeId = target.dataset.recipeId;
             if (recipeId) {
@@ -739,9 +732,9 @@ const init = () => {
 
     copyShoppingListBtn?.addEventListener('click', () => {
         let textToCopy = "買い物リスト\n==========\n\n";
-        shoppingList.forEach((item: any) => {
+        shoppingList.forEach((item) => {
             textToCopy += `■ ${item.recipeInfo.recipeName}\n`;
-            item.items.forEach((ingredient: string) => {
+            item.items.forEach((ingredient) => {
                 textToCopy += `- ${ingredient}\n`;
             });
             textToCopy += '\n';
@@ -776,15 +769,14 @@ const init = () => {
     });
     
     // Voice Input
-    // Fix: Cast window to `any` to access non-standard SpeechRecognition APIs.
-    const SpeechRecognitionAPI = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognitionAPI) {
         recognition = new SpeechRecognitionAPI();
         recognition.continuous = false;
         recognition.lang = 'ja-JP';
         recognition.interimResults = false;
 
-        const showVoiceError = (message: string) => {
+        const showVoiceError = (message) => {
             if (voiceError) {
                 voiceError.textContent = message;
                 voiceError.classList.remove('hidden');
@@ -814,8 +806,7 @@ const init = () => {
 
         // Proactively check permissions if API is available
         if (navigator.permissions) {
-             // Fix: Cast permission descriptor to `any` to use 'microphone' which may not be in default TS libs.
-             navigator.permissions.query({ name: 'microphone' } as any).then((permissionStatus) => {
+             navigator.permissions.query({ name: 'microphone' }).then((permissionStatus) => {
                 const updateUIForPermission = () => {
                     if (permissionStatus.state === 'denied') {
                         setUIAccessDenied();
@@ -835,7 +826,7 @@ const init = () => {
         }
 
 
-        recognition.onresult = (event: any) => {
+        recognition.onresult = (event) => {
             const transcript = event.results[0][0].transcript.replace(/。/g, ''); //句点を削除
             if (input) {
                 const currentVal = input.value.trim();
@@ -843,7 +834,7 @@ const init = () => {
             }
         };
 
-        recognition.onerror = (event: any) => {
+        recognition.onerror = (event) => {
             console.error('Speech recognition error', event.error);
             let errorMessage = '音声認識中にエラーが発生しました。';
             if (event.error === 'not-allowed') {
