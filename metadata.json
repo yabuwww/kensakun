@@ -1,0 +1,7 @@
+{
+  "name": "Copy of レシピけんさくん",
+  "description": "Prompt Gemini in this simple example",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
