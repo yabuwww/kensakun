@@ -1,4 +1,5 @@
 
+
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -198,11 +199,9 @@ const saveAllergies = (value: string) => {
 // --- Rendering Functions ---
 
 /** Creates the HTML for a single recipe card. */
-const createRecipeCard = (recipe: Recipe, origin: 'search' | 'favorites'): HTMLDivElement => {
-    const card = document.createElement('div');
+const createRecipeCard = (recipe: Recipe, origin: 'search' | 'favorites'): HTMLButtonElement => {
+    const card = document.createElement('button');
     card.className = 'result-card';
-    card.setAttribute('role', 'button');
-    card.setAttribute('tabindex', '0');
     card.dataset.recipeId = recipe.id;
 
     card.innerHTML = `
@@ -294,11 +293,9 @@ const renderHistory = () => {
     }
 
     history.slice().reverse().forEach(item => { // Show most recent first
-        const historyItemEl = document.createElement('div');
+        const historyItemEl = document.createElement('button');
         historyItemEl.className = 'history-item';
         historyItemEl.dataset.historyId = item.id;
-        historyItemEl.setAttribute('role', 'button');
-        historyItemEl.setAttribute('tabindex', '0');
         historyItemEl.innerHTML = `
             <span class="history-ingredients">${item.query.ingredients}</span>
             <div class="history-meta">

@@ -375,14 +375,11 @@ button[type="submit"]:disabled {
     overflow: hidden;
     border: 1px solid transparent;
     transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
-}
-
-.result-card[role="button"] {
     cursor: pointer;
 }
 
-.result-card[role="button"]:hover,
-.result-card[role="button"]:focus {
+.result-card:hover,
+.result-card:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 3px var(--focus-ring-color);
@@ -940,4 +937,17 @@ html.dark-mode .theme-switch input:checked + .slider {
     background-color: var(--primary-darker-color);
     cursor: default;
     opacity: 0.8;
+}
+
+/* Reset button styles for card elements for better mobile compatibility */
+button.result-card,
+button.history-item {
+  font-weight: 400;
+  text-align: left;
+  display: block;
+  width: 100%;
+}
+
+button.result-card {
+  padding: 0;
 }
