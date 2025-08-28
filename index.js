@@ -116,7 +116,7 @@ let recognition = null;
 
 
 // --- API Initialization ---
-const API_KEY = AIzaSyAR8SahNPyptp0mQqHwdnqjtf49cmkIx0s;
+const API_KEY = 'AIzaSyAR8SahNPyptp0mQqHwdnqjtf49cmkIx0s';
 if (!API_KEY) {
   showError('APIキーが設定されていません。');
   throw new Error('API_KEY is not set');
