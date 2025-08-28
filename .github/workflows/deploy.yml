@@ -6,6 +6,8 @@ on:
   push:
     branches:
       - main # mainブランチにpushされた時のみ実行
+permissions:
+  contents: write
 
 # 実行するジョブ
 jobs:
