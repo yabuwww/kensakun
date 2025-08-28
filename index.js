@@ -6,31 +6,53 @@
 import {GoogleGenAI, Type} from '@google/genai';
 
 // --- DOM Element Selection ---
+/** @type {HTMLFormElement | null} */
 const form = document.querySelector('form');
+/** @type {HTMLTextAreaElement | null} */
 const input = document.querySelector('#ingredients');
+/** @type {HTMLInputElement | null} */
 const servingsInput = document.querySelector('#servings');
+/** @type {HTMLButtonElement | null} */
 const servingsDecrementBtn = document.querySelector('#servings-decrement');
+/** @type {HTMLButtonElement | null} */
 const servingsIncrementBtn = document.querySelector('#servings-increment');
+/** @type {HTMLInputElement | null} */
 const mealPrepToggle = document.querySelector('#meal-prep-toggle');
+/** @type {HTMLInputElement | null} */
 const allergiesInput = document.querySelector('#allergies');
+/** @type {HTMLElement | null} */
 const suggestionButtons = document.querySelector('#suggestions');
+/** @type {HTMLButtonElement | null} */
 const voiceInputBtn = document.querySelector('#voice-input-btn');
+/** @type {HTMLElement | null} */
 const voiceError = document.querySelector('#voice-error');
+/** @type {HTMLButtonElement | null} */
 const saveAllergiesBtn = document.querySelector('#save-allergies-btn');
 
+/** @type {HTMLElement | null} */
 const resultArea = document.querySelector('#result-area');
+/** @type {HTMLElement | null} */
 const resultsContainer = document.querySelector('#results');
+/** @type {HTMLElement | null} */
 const skeletonLoader = document.querySelector('#skeleton-loader');
+/** @type {HTMLElement | null} */
 const recipeListView = document.querySelector('#recipe-list-view');
+/** @type {HTMLElement | null} */
 const recipeDetailView = document.querySelector('#recipe-detail-view');
 
+/** @type {HTMLElement | null} */
 const paginationControls = document.querySelector('#pagination-controls');
+/** @type {HTMLButtonElement | null} */
 const prevPageBtn = document.querySelector('#prev-page-btn');
+/** @type {HTMLButtonElement | null} */
 const nextPageBtn = document.querySelector('#next-page-btn');
+/** @type {HTMLElement | null} */
 const pageIndicator = document.querySelector('#page-indicator');
 
+/** @type {HTMLElement | null} */
 const historyContainer = document.querySelector('#history-container');
 
+/** @type {HTMLInputElement | null} */
 const themeSwitcher = document.querySelector('#theme-switcher');
 
 // Bottom Nav
@@ -45,9 +67,13 @@ const navButtons = {
 const allContentAreas = [searchArea, favoritesArea, shoppingListArea];
 const allNavButtons = Object.values(navButtons).filter(b => b !== null);
 
+/** @type {HTMLElement | null} */
 const favoritesContainer = document.querySelector('#favorites-container');
+/** @type {HTMLElement | null} */
 const shoppingListContainer = document.querySelector('#shopping-list-container');
+/** @type {HTMLElement | null} */
 const shoppingListActions = document.querySelector('#shopping-list-actions');
+/** @type {HTMLButtonElement | null} */
 const copyShoppingListBtn = document.querySelector('#copy-shopping-list');
 
 /**
@@ -68,10 +94,24 @@ const FAVORITES_STORAGE_KEY = 'recipe-app-favorites';
 const SHOPPING_LIST_STORAGE_KEY = 'recipe-app-shopping-list';
 const ALLERGIES_STORAGE_KEY = 'recipe-app-allergies';
 
+/**
+ * @typedef {{
+ *   id: string;
+ *   query: { ingredients: string; servings: string; mealPrep: boolean; allergies: string; };
+ *   pages: any[][];
+ *   currentPageIndex: number;
+ * }} HistoryItem
+ */
+
+/** @type {HistoryItem[]} */
 let history = [];
+/** @type {HistoryItem | null} */
 let currentHistoryItem = null;
+/** @type {Set<string>} */
 let favorites = new Set();
+/** @type {Map<string, { recipeInfo: {id: string, recipeName: string}, items: Set<string> }>} */
 let shoppingList = new Map();
+/** @type {any} */
 let recognition = null;
 
 
@@ -94,11 +134,14 @@ const loadStateFromLocalStorage = () => {
 
         const storedShoppingList = localStorage.getItem(SHOPPING_LIST_STORAGE_KEY);
         if (storedShoppingList) {
+            /** @type {[string, { recipeInfo: any; items: string[] }][]} */
             const parsed = JSON.parse(storedShoppingList);
             // Convert items back to a Set
             parsed.forEach((item) => {
+                // @ts-ignore
                 item[1].items = new Set(item[1].items);
             });
+            // @ts-ignore
             shoppingList = new Map(parsed);
         }
 
@@ -137,13 +180,19 @@ const saveShoppingList = () => {
     });
     localStorage.setItem(SHOPPING_LIST_STORAGE_KEY, JSON.stringify(arrayRepresentation));
 };
+/** @param {string} value */
 const saveAllergies = (value) => {
     localStorage.setItem(ALLERGIES_STORAGE_KEY, value);
 };
 
 // --- Rendering Functions ---
 
-/** Creates the HTML for a single recipe card. */
+/** 
+ * Creates the HTML for a single recipe card.
+ * @param {any} recipe The recipe object.
+ * @param {string} origin The view where the card is created ('search' or 'favorites').
+ * @returns {HTMLButtonElement}
+ */
 const createRecipeCard = (recipe, origin) => {
     const card = document.createElement('button');
     card.className = 'result-card';
@@ -166,6 +215,7 @@ const createRecipeCard = (recipe, origin) => {
             </button>
         </div>
     `;
+    /** @type {HTMLButtonElement | null} */
     const likeBtn = card.querySelector('.like-btn');
     if (favorites.has(recipe.id)) {
         likeBtn?.classList.add('liked');
@@ -254,7 +304,10 @@ const renderHistory = () => {
     });
 };
 
-/** Toggles a recipe in the favorites list. */
+/** 
+ * Toggles a recipe in the favorites list. 
+ * @param {string} recipeId
+ */
 const toggleFavorite = (recipeId) => {
     if (favorites.has(recipeId)) {
         favorites.delete(recipeId);
@@ -370,6 +423,10 @@ const showRecipeListView = () => {
     resultsContainer?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
+/**
+ * @param {any} recipe
+ * @param {string} origin
+ */
 const showRecipeDetailView = (recipe, origin) => {
     if(!recipeListView || !recipeDetailView) return;
     recipeListView.classList.add('hidden');
@@ -419,6 +476,7 @@ const showRecipeDetailView = (recipe, origin) => {
     });
     
     document.getElementById('detail-like-btn')?.addEventListener('click', (e) => {
+        /** @type {HTMLButtonElement} */
         const button = e.currentTarget;
         toggleFavorite(recipe.id);
         button.classList.toggle('liked');
@@ -432,9 +490,11 @@ const showRecipeDetailView = (recipe, origin) => {
     });
 
     document.getElementById('add-to-shopping-list-from-detail')?.addEventListener('click', () => {
+        /** @type {NodeListOf<HTMLInputElement>} */
         const checkboxes = recipeDetailView.querySelectorAll('.ingredient-list input[type="checkbox"]:checked');
         const selectedItems = Array.from(checkboxes).map(cb => cb.dataset.ingredient || '');
         
+        /** @type {HTMLButtonElement | null} */
         const button = document.getElementById('add-to-shopping-list-from-detail');
         
         if (button) {
@@ -467,7 +527,10 @@ const showRecipeDetailView = (recipe, origin) => {
     recipeDetailView.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 
-/** Switches the main content view. */
+/** 
+ * Switches the main content view.
+ * @param {string} targetAreaId 
+ */
 const switchView = (targetAreaId) => {
     allContentAreas.forEach(area => area?.classList.add('hidden'));
     allNavButtons.forEach(button => button?.classList.remove('active'));
@@ -486,7 +549,9 @@ const switchView = (targetAreaId) => {
 
 
 // --- Gemini API ---
-
+/**
+ * @param {any} query
+ */
 const callGeminiAPI = async (query) => {
     const { ingredients, servings, mealPrep, allergies } = query;
     const prompt = `
@@ -558,11 +623,14 @@ const callGeminiAPI = async (query) => {
 };
 
 // --- Event Handlers ---
-
+/**
+ * @param {Event} event
+ */
 const handleFormSubmit = async (event) => {
     event.preventDefault();
     if (!form || !input || !servingsInput || !mealPrepToggle || !allergiesInput || !skeletonLoader || !resultsContainer || !resultArea) return;
 
+    /** @type {HTMLButtonElement | null} */
     const submitButton = form.querySelector('button[type="submit"]');
     if (!submitButton) return;
     const ingredientsValue = input.value.trim();
@@ -591,6 +659,7 @@ const handleFormSubmit = async (event) => {
     const recipes = await callGeminiAPI(query);
     
     if (recipes) {
+        /** @type {HistoryItem} */
         const newHistoryItem = {
             id: `history-${Date.now()}`,
             query,
@@ -612,6 +681,9 @@ const handleFormSubmit = async (event) => {
     submitButton.textContent = 'レシピを探す';
 };
 
+/**
+ * @param {string} historyId
+ */
 const handleHistoryClick = (historyId) => {
     const item = history.find(h => h.id === historyId);
     if (item) {
@@ -672,7 +744,7 @@ const init = () => {
     });
 
     suggestionButtons?.addEventListener('click', (e) => {
-        const target = e.target;
+        const target = /** @type {HTMLElement} */ (e.target);
         if (target.classList.contains('suggestion-btn')) {
             if (input) {
                 const currentVal = input.value.trim();
@@ -682,17 +754,17 @@ const init = () => {
     });
     
     saveAllergiesBtn?.addEventListener('click', () => {
-        if (allergiesInput) {
+        if (allergiesInput && saveAllergiesBtn) {
             saveAllergies(allergiesInput.value);
+            saveAllergiesBtn.textContent = '保存済み';
+            saveAllergiesBtn.classList.add('saved');
+            saveAllergiesBtn.disabled = true;
+            setTimeout(() => {
+                saveAllergiesBtn.textContent = '保存';
+                saveAllergiesBtn.classList.remove('saved');
+                saveAllergiesBtn.disabled = false;
+            }, 2000);
         }
-        saveAllergiesBtn.textContent = '保存済み';
-        saveAllergiesBtn.classList.add('saved');
-        saveAllergiesBtn.disabled = true;
-        setTimeout(() => {
-            saveAllergiesBtn.textContent = '保存';
-            saveAllergiesBtn.classList.remove('saved');
-            saveAllergiesBtn.disabled = false;
-        }, 2000);
     });
     
     prevPageBtn?.addEventListener('click', () => {
@@ -718,7 +790,7 @@ const init = () => {
     });
 
     shoppingListContainer?.addEventListener('click', (e) => {
-        const target = e.target;
+        const target = /** @type {HTMLElement} */ (e.target);
         if (target.classList.contains('remove-recipe-btn')) {
             const recipeId = target.dataset.recipeId;
             if (recipeId) {
@@ -769,13 +841,15 @@ const init = () => {
     });
     
     // Voice Input
+    // @ts-ignore
     const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SpeechRecognitionAPI) {
         recognition = new SpeechRecognitionAPI();
         recognition.continuous = false;
         recognition.lang = 'ja-JP';
-        recognition.interimResults = false;
+        recognition.interrimResults = false;
 
+        /** @param {string} message */
         const showVoiceError = (message) => {
             if (voiceError) {
                 voiceError.textContent = message;
@@ -806,6 +880,7 @@ const init = () => {
 
         // Proactively check permissions if API is available
         if (navigator.permissions) {
+             // @ts-ignore
              navigator.permissions.query({ name: 'microphone' }).then((permissionStatus) => {
                 const updateUIForPermission = () => {
                     if (permissionStatus.state === 'denied') {
