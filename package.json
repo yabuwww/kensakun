@@ -9,11 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@google/genai": "^0.7.0"
+    "@google/generative-ai": "^0.7.1"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
-    "typescript": "~5.8.2",
-    "vite": "^6.2.0"
+    "@types/node": "^20.12.7",
+    "netlify-cli": "^17.22.1",
+    "typescript": "~5.4.5",
+    "vite": "^5.2.8"
   }
 }
