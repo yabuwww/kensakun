@@ -1,5 +1,4 @@
-// 最初のimport文はそのまま残します
-import {GoogleGenAI, Type} from '@google/genai';
+
 
 // --- DOM Element Selection (変更なし) ---
 const form = document.querySelector('form');
