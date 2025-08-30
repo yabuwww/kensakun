@@ -1,6 +1,6 @@
 "devDependencies": {
     "@types/node": "^20.12.7",
-    "@vitejs/plugin-react": "^4.2.1", // ← この行を追加
+    "@vitejs/plugin-react": "^4.2.1", 
     "typescript": "~5.4.5",
     "vite": "^5.2.8"
   }
