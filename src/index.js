@@ -2,7 +2,7 @@
  * @license
  * SPDX-License-Identifier: Apache-2.0
 */
-import {GoogleGenAI, Type} from '@google/genai';
+
 
 // --- DOM Element Selection ---
 /** @type {HTMLFormElement | null} */
