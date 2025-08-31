@@ -29,7 +29,7 @@ let recognition = null;
  */
 const callApiViaGas = async (query) => {
   // 【重要】GASをデプロイした時に発行されたウェブアプリのURLをここに貼り付けてください
-  const GAS_WEB_APP_URL = 'ここにあなたのGASのウェブアプリURLを貼り付け';
+  const GAS_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwaZ7m9zcvJMsEEY8d46QP7gE7CnA7irsCHJp9pskTVids7EA9KrtKheWDjlFEwBRqifA/exec';
 
   try {
     const response = await fetch(GAS_WEB_APP_URL, {
